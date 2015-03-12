@@ -14,6 +14,7 @@ import (
     "github.com/codegangsta/cli"
     "github.com/parnurzeal/gorequest"
     "github.com/fatih/color"
+    "github.com/nightlyone/lockfile"
     "../etcd"
     "../config"
 )
@@ -28,6 +29,20 @@ func NewSyncCommand() cli.Command {
 
 // syncCommandFunc executes the "sync" command.
 func syncCommandFunc(c *cli.Context) {
+
+    lock, err := lockfile.New("/tmp/replicator_sync.lck")
+    if err != nil {
+        fmt.Println("Cannot init lock. reason: %v", err)
+        panic(err)
+    }
+    err = lock.TryLock()
+
+    if err != nil {
+        fmt.Fprintf(color.Output, " %s The sync process already started.\n", color.RedString("*"))
+        os.Exit(1)
+    }
+
+    defer lock.Unlock()
 
     var ip string = ""
 
@@ -94,7 +109,6 @@ func buildCommand(command config.Command, ip string) *exec.Cmd {
 }
 
 func execSync(name string, host string, cmd *exec.Cmd) {
-    //cmd.StderrPipe()
 
     out, err := cmd.Output()
     if err != nil {
