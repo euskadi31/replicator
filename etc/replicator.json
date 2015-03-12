@@ -1,0 +1,20 @@
+{
+    "discovery": "https://discovery.etcd.io/fa5a2b5684081294df1302fcdf1aa144",
+    "commands": {
+        "kokoroe": {
+            "cmd": "rsync",
+            "option": "-alWz",
+            "path": "/home/sites/kokoroe/",
+            "user": "kokoroe",
+            "excludes": [
+                "app/cache/*",
+                "app/logs/*",
+                ".git",
+                "node_modules",
+                "bower_components",
+                "_assets"
+            ],
+            "delete": true
+        }
+    }
+}
