@@ -1,7 +1,7 @@
 
 build: deps
 	@echo "Build..."
-	@go build .
+	@go build -o bin/replicator .
 
 deps:
 	@echo "Fetch deps..."

@@ -1,0 +1,71 @@
+#! /bin/sh
+# Author: Axel Etcheverry <axel@etcheverry.biz>
+#
+# Please remove the "Author" lines above and replace them
+# with your own name if you copy and modify this script.
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Replicator service"
+NAME=replicator
+DAEMON=/usr/local/sbin/$NAME
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+   ./$DAEMON join > /dev/null 1>> /var/log/replicator.log
+   RETVAL="$?"
+   [ "$RETVAL" = 2 ] && return 2
+   return "$RETVAL"
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+   ./$DAEMON leave > /dev/null 1>> /var/log/replicator.log
+   RETVAL="$?"
+   [ "$RETVAL" = 2 ] && return 2
+   return "$RETVAL"
+}
+
+case "$1" in
+ start)
+   [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+   do_start
+   case "$?" in
+       0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+       2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+   esac
+   ;;
+ stop)
+   [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+   do_stop
+   case "$?" in
+       0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+       2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+   esac
+   ;;
+ status)
+   ./$DAEMON list 1>> /var/log/replicator.log
+   ;;
+ *)
+   echo "Usage: $SCRIPTNAME {start|stop|status}" >&2
+   exit 3
+   ;;
+esac
+
+:
