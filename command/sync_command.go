@@ -7,6 +7,7 @@ import (
     "os"
     "os/exec"
     "log"
+    "strconv"
     //"bytes"
     "fmt"
     "net"
@@ -103,7 +104,9 @@ func buildCommand(command config.Command, ip string) *exec.Cmd {
         args = append(args, "--delete")
     }
 
-    args = append(args, "--timeout=1")
+    if (command.Timeout > 0) {
+        args = append(args, "--timeout=" + strconv.Itoa(command.Timeout))
+    }
 
     return exec.Command(command.Cmd, args...)
 }

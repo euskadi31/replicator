@@ -14,7 +14,8 @@
                 "bower_components",
                 "_assets"
             ],
-            "delete": true
+            "delete": true,
+            "timeout": 5
         }
     }
 }

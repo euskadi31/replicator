@@ -10,4 +10,5 @@ type Command struct {
     User string `json:"user"`
     Excludes[] string `json:"excludes"`
     Delete bool `json:"delete"`
+    Timeout int `json:"timeout"`
 }
