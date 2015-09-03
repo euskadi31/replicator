@@ -30,7 +30,6 @@ func NewSyncCommand() cli.Command {
 
 // syncCommandFunc executes the "sync" command.
 func syncCommandFunc(c *cli.Context) {
-
     lock, err := lockfile.New("/tmp/replicator_sync.lck")
     if err != nil {
         fmt.Println("Cannot init lock. reason: %v", err)
@@ -129,7 +128,6 @@ func buildCommand(command config.Command, ip string) *exec.Cmd {
 }
 
 func execSync(name string, host string, cmd *exec.Cmd) {
-
     _, err := cmd.Output()
     if err != nil {
         fmt.Fprintf(color.Output, " %s Sync %s on %s\t\t[ %s ]\n", color.RedString("*"), name, host, color.RedString("!!"))
@@ -140,7 +138,6 @@ func execSync(name string, host string, cmd *exec.Cmd) {
 }
 
 func execCommand(name string, command config.Command, nodes[] etcd.Key, ip string) {
-
     for _, element := range nodes {
         if (element.Value != ip) {
             execSync(name, element.Key[49:], buildCommand(command, element.Value))
