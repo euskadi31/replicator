@@ -68,6 +68,21 @@ func syncCommandFunc(c *cli.Context) {
         os.Exit(1)
     }
 
+    var target string = ""
+
+    if len(c.Args()) == 1 {
+        target = c.Args()[0]
+    }
+
+    if target != "" {
+        _, targetExists := config.Commands[target]
+
+        if (targetExists == false) {
+            fmt.Fprintf(color.Output, " %s Target \"%s\" not defined.\n", color.RedString("*"), target)
+            os.Exit(1)
+        }
+    }
+
     resp, body, errs := gorequest.New().
         Get(config.Discovery).
         End()
@@ -88,7 +103,9 @@ func syncCommandFunc(c *cli.Context) {
         }
 
         for name, command := range config.Commands {
-            execCommand(name, command, data.Node.Nodes, ip)
+            if target == "" || target == name {
+                execCommand(name, command, data.Node.Nodes, ip)
+            }
         }
     }
 }
@@ -113,20 +130,18 @@ func buildCommand(command config.Command, ip string) *exec.Cmd {
 
 func execSync(name string, host string, cmd *exec.Cmd) {
 
-    out, err := cmd.Output()
+    _, err := cmd.Output()
     if err != nil {
         fmt.Fprintf(color.Output, " %s Sync %s on %s\t\t[ %s ]\n", color.RedString("*"), name, host, color.RedString("!!"))
         log.Print(err)
     } else {
         fmt.Fprintf(color.Output, " %s Sync %s on %s\t\t[ %s ]\n", color.GreenString("*"), name, host, color.GreenString("ok"))
-        log.Print(out)
     }
 }
 
 func execCommand(name string, command config.Command, nodes[] etcd.Key, ip string) {
 
     for _, element := range nodes {
-
         if (element.Value != ip) {
             execSync(name, element.Key[49:], buildCommand(command, element.Value))
         }
